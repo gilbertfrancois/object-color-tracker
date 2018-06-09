@@ -1,0 +1,153 @@
+//
+// Created by G.F. Duivesteijn on 09/06/2018.
+//
+
+#pragma once
+
+#include "ofMain.h"
+#include "ofxOsc.h"
+#include "ofxGui.h"
+#include "ofxCv.h"
+
+class ofApp : public ofBaseApp {
+
+private:
+    const int camWidth = 640;
+    const int camHeight = 480;
+    const int A = camWidth * camHeight;
+
+    ofVideoGrabber videoGrabber;
+    ofTrueTypeFont font;
+    ofxOscSender sender;
+    ofxPanel gui;
+    bool showGui = true;
+    bool oscMessageSent = false;
+
+    ofParameterGroup color_settings_group;
+    ofParameter<int> tol_h;
+    ofParameter<int> tol_s;
+    ofParameter<int> tol_v;
+    ofParameter<int> sample_radius;
+    ofParameter<int> min_area_size;
+    ofParameter<int> max_area_size;
+    ofParameter<bool> one_blob_only;
+    ofParameter<bool> lpf;
+
+    ofParameterGroup display_settings_group;
+    ofParameter<int> fps;
+    ofParameter<bool> show_trail;
+    ofParameter<bool> show_webcam_view;
+    ofParameter<bool> show_contours;
+
+    ofParameterGroup comm_settings_group;
+    ofParameter<std::string> msg;
+    ofParameter<std::string> server;
+    ofParameter<std::string> port;
+
+    int Hmin = 0;
+    int Hmax = 0;
+    int Smin = 0;
+    int Smax = 0;
+    int Vmin = 0;
+    int Vmax = 0;
+    int Hmin_tol = 0;
+    int Hmax_tol = 0;
+    int Smin_tol = 0;
+    int Smax_tol = 0;
+    int Vmin_tol = 0;
+    int Vmax_tol = 0;
+
+    cv::Mat rgb;
+    cv::Mat rgbm;
+    cv::Mat hsb;
+    cv::Mat h;
+    cv::Mat s;
+    cv::Mat b;
+    cv::Mat ftr;
+    cv::Mat maskH;
+    cv::Mat maskS;
+    cv::Mat maskV;
+
+    int simplifyMode = CV_CHAIN_APPROX_SIMPLE;
+    int contourFindingMode = CV_RETR_EXTERNAL;
+    std::vector<std::vector<cv::Point>> allContours;
+    std::vector<cv::Moments> mu;
+    std::vector<cv::Point2f> mc;
+    double max_area = 0.0;
+    int argmax_area = -1;
+
+    std::vector<ofVec3f> buffer;
+    int buffer_size = 50;
+    int buffer_position = 0;
+
+    int mouseX = 0;
+    int mouseY = 0;
+
+public:
+
+    void setup();
+
+    void update();
+
+    void draw();
+
+    void keyPressed(int key);
+
+    void keyReleased(int key);
+
+    void mouseMoved(int x, int y);
+
+    void mouseDragged(int x, int y, int button);
+
+    void mousePressed(int x, int y, int button);
+
+    void mouseReleased(int x, int y, int button);
+
+    void mouseEntered(int x, int y);
+
+    void mouseExited(int x, int y);
+
+    void windowResized(int w, int h);
+
+    void dragEvent(ofDragInfo dragInfo);
+
+    void gotMessage(ofMessage msg);
+
+    void find_blobs();
+
+    void calibrate(int x, int y);
+
+    void setupGui();
+
+    void updateHSVRange();
+
+    void drawMouseCursor() const;
+
+    void drawTrail();
+
+    void updateNormalizedObjectLocationInBuffer(ofVec3f v);
+
+    int modn(int a, int b);
+
+    ofVec3f windowToNorm(ofVec3f v);
+
+    ofVec3f normToWindow(ofVec3f v);
+
+    void drawObjectCursorAtPosition(ofVec3f v);
+
+    void setupCamera();
+    
+    void setupImageBuffers();
+
+    void setupRingBuffer();
+
+    void updateFilterMasks();
+
+    void drawStatusMessage(ofVec3f v);
+
+    void updateObjectLocation();
+
+    void drawObjectCursor();
+
+    void sendOscMessage();
+};
