@@ -10,7 +10,10 @@ When choosing an object (or clothes) with distinct colour (e.g. bright green), y
 
 **Note**: Only the largest detected object (blob) is used as "cursor". Other, smaller objects within calibrated colour range are ignored.
 
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/rXNgobgluP0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+*Click on the image below to see a small demo (youtube).*
+
+[![Demo video](https://img.youtube.com/vi/rXNgobgluP0/0.jpg)](http://www.youtube.com/watch?v=rXNgobgluP0)
+
 
 ## Calibration Settings
 
