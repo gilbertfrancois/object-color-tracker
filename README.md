@@ -39,7 +39,34 @@ Note that ofxCv is not standard packed in openFrameworks and needs to be downloa
 ## Known Issues
 
 - The app does not work well in a scene with strong directional light. When e.g. the light comes only from one side, the dynamic range of the object will be too large and the app might loose track of the object when moving around in front of the camera.
+
 - Some cameras have quite agressive white balance corrections. When for instance moving a green object in front of the camera, on some cameras the colour jumps continuously from too yellow to too blue and everything in between. This is very annoying since it is hard to calibrate properly so that the object is correctly detected in every white balance setting. Some fancy external cameras have "advanced features" which allows you to _freeze_ the white balance. 
+
+  For macOS, you can try the following change in openFrameworks library: 
+
+  Edit file `ofAVFoundationGrabber.mm` and replace the function `-(void) startCapture ` with:
+
+```objective-c
+-(void) startCapture{
+
+	[self.captureSession startRunning];
+
+	[captureInput.device lockForConfiguration:nil];
+
+    if( [captureInput.device isFocusModeSupported:AVCaptureFocusModeAutoFocus] ) {
+        [captureInput.device setFocusMode:AVCaptureFocusModeAutoFocus ];
+    }
+    if( [captureInput.device isExposureModeSupported:AVCaptureExposureModeLocked] ) {
+        NSLog(@"-- Attempt to lock exposure");
+        [captureInput.device setExposureMode:AVCaptureExposureModeLocked ];
+    }
+    if ([captureInput.device isWhiteBalanceModeSupported:AVCaptureWhiteBalanceModeLocked]) {
+        NSLog(@"-- Attempt to lock white balance");
+        [captureInput.device setWhiteBalanceMode:AVCaptureWhiteBalanceModeLocked];
+    }
+}
+
+```
 
 ## License
 
