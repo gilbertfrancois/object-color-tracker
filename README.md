@@ -6,7 +6,7 @@
 
 This app serves as an input feature extractor for [Wekinator](http://www.wekinator.org) and allows you to use it as input device to play music, paint in the air, track people/objects on stage performance or in general, be very expressive without touching a computer. 
 
-When choosing an object (or clothes) with distinct colour (e.g. bright green), you can calibrate the colour range by holding the object in front of the camera, clicking with the mouse on the object. Then the object will be tracked. The center of the object will act as pointer with 3 axis, $x$, $y$ and $z$. The $x$ and $y$ values denote the position in the window, the $z$ value denotes the area of the object with respect to the window size and allows you to be more expressive with the output app. 
+When choosing an object (or clothes) with distinct colour (e.g. bright green), you can calibrate the colour range by holding the object in front of the camera, clicking with the mouse on the object. Then the object will be tracked. The center of the object will act as pointer with 3 axis, *x*, *y* and *z*. The *x* and *y* values denote the position in the window, the *z* value denotes the area of the object with respect to the window size and allows you to be more expressive with the output app. 
 
 **Note**: Only the largest detected object (blob) is used as "cursor". Other, smaller objects within calibrated colour range are ignored.
 
@@ -42,9 +42,8 @@ Note that ofxCv is not standard packed in openFrameworks and needs to be downloa
 
 - Some cameras have quite agressive white balance corrections. When for instance moving a green object in front of the camera, on some cameras the colour jumps continuously from too yellow to too blue and everything in between. This is very annoying since it is hard to calibrate properly so that the object is correctly detected in every white balance setting. Some fancy external cameras have "advanced features" which allows you to _freeze_ the white balance. 
 
-  For macOS, you can try the following change in openFrameworks library: 
+  If you compile the code yourself and use macOS, you can try the following change in openFrameworks library. Edit file `[of_folder]/libs/openframeworks/video/ofAVFoundationGrabber.mm` and replace the function `-(void) startCapture ` with:
 
-  Edit file `ofAVFoundationGrabber.mm` and replace the function `-(void) startCapture ` with:
 
 ```objective-c
 -(void) startCapture{
