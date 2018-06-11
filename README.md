@@ -23,7 +23,9 @@ When choosing an object (or clothes) with distinct colour (e.g. bright green), y
 - Sample radius: The patch size for measuring the colour range.
 - Low pass filter: Weak filter that adds a little bit of smoothing. Disable this feature if you think there is too much lag.
 
+## Prebuild Binary
 
+A ready-to-run binary is available for macOS and can be downloaded from the [releases](https://github.com/gilbertfrancois/object-color-tracker/releases) page.
 
 ## Compile
 
@@ -40,7 +42,7 @@ Note that ofxCv is not standard packed in openFrameworks and needs to be downloa
 
 - The app does not work well in a scene with strong directional light. When e.g. the light comes only from one side, the dynamic range of the object will be too large and the app might loose track of the object when moving around in front of the camera.
 
-- Some cameras have quite agressive white balance corrections. When for instance moving a green object in front of the camera, on some cameras the colour jumps continuously from too yellow to too blue and everything in between. This is very annoying since it is hard to calibrate properly so that the object is correctly detected in every white balance setting. Some fancy external cameras have "advanced features" which allows you to _freeze_ the white balance. 
+- Some cameras have quite aggressive white balance corrections. When for instance moving a green object in front of the camera, on some cameras the colour jumps continuously from too yellow to too blue and everything in between. This is very annoying since it is hard to calibrate properly so that the object is correctly detected in every white balance setting. Some fancy external cameras have "advanced features" which allows you to _freeze_ the white balance. 
 
   If you compile the code yourself and use macOS, you can try the following change in openFrameworks library. Edit file `[of_folder]/libs/openframeworks/video/ofAVFoundationGrabber.mm` and replace the function `-(void) startCapture ` with:
 
