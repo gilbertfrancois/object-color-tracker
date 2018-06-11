@@ -126,7 +126,8 @@ void ofApp::setupGui() {
             static_cast<unsigned long> (0.25 * ofGetWindowWidth() * ofGetWindowHeight()),
             1000, static_cast<unsigned long>(0.5 *  ofGetWindowWidth() * ofGetWindowHeight())));
     color_settings_group.add(sample_radius.set("Sample radius", 12, 1, 20));
-    color_settings_group.add(one_blob_only.set("Only largest blob", true));
+    one_blob_only.set("Only largest blob", true);
+//    color_settings_group.add(one_blob_only.set("Only largest blob", true));
     color_settings_group.add(lpf.set("Low pass filter", true));
 
     comm_settings_group.setName("Commumication");
