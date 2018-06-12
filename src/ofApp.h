@@ -80,16 +80,54 @@ private:
     int buffer_size = 50;
     int buffer_position = 0;
 
-    int mouseX = 0;
-    int mouseY = 0;
 
 public:
+
+    //--------------------------------------------------------------
 
     void setup();
 
     void update();
 
     void draw();
+
+    //--------------------------------------------------------------
+
+    void setupCamera();
+
+    void setupRingBuffer();
+
+    void setupImageBuffers();
+
+    void setupGui();
+
+    //--------------------------------------------------------------
+
+    void updateObjectLocation();
+
+    void updateFilterMasks();
+
+    void updateHSVRange();
+
+    void updateNormalizedObjectLocationInBuffer(ofVec3f v);
+
+    //--------------------------------------------------------------
+
+    void sendOscMessage();
+
+    //--------------------------------------------------------------
+
+    void drawObjectCursor();
+
+    void drawObjectCursorAtPosition(ofVec3f v);
+
+    void drawMouseCursor() const;
+
+    void drawTrail();
+
+    void drawStatusMessage(ofVec3f v);
+
+    //--------------------------------------------------------------
 
     void keyPressed(int key);
 
@@ -109,45 +147,22 @@ public:
 
     void windowResized(int w, int h);
 
-    void dragEvent(ofDragInfo dragInfo);
-
     void gotMessage(ofMessage msg);
 
-    void find_blobs();
+    void dragEvent(ofDragInfo dragInfo);
+
+    //--------------------------------------------------------------
 
     void calibrate(int x, int y);
 
-    void setupGui();
+    void find_blobs();
 
-    void updateHSVRange();
-
-    void drawMouseCursor() const;
-
-    void drawTrail();
-
-    void updateNormalizedObjectLocationInBuffer(ofVec3f v);
-
-    int modn(int a, int b);
+    //--------------------------------------------------------------
 
     ofVec3f windowToNorm(ofVec3f v);
 
     ofVec3f normToWindow(ofVec3f v);
 
-    void drawObjectCursorAtPosition(ofVec3f v);
+    int modn(int a, int b);
 
-    void setupCamera();
-    
-    void setupImageBuffers();
-
-    void setupRingBuffer();
-
-    void updateFilterMasks();
-
-    void drawStatusMessage(ofVec3f v);
-
-    void updateObjectLocation();
-
-    void drawObjectCursor();
-
-    void sendOscMessage();
 };

@@ -9,9 +9,9 @@
 
 //--------------------------------------------------------------
 void ofApp::setup() {
-    
+
     setupCamera();
-    
+
     setupImageBuffers();
 
     setupGui();
@@ -124,7 +124,7 @@ void ofApp::setupGui() {
     color_settings_group.add(min_area_size.set("Minimum area size", 200, 10, 10000));
     color_settings_group.add(max_area_size.set("Maximum area size",
             static_cast<unsigned long> (0.25 * ofGetWindowWidth() * ofGetWindowHeight()),
-            1000, static_cast<unsigned long>(0.5 *  ofGetWindowWidth() * ofGetWindowHeight())));
+            1000, static_cast<unsigned long>(0.5 * ofGetWindowWidth() * ofGetWindowHeight())));
     color_settings_group.add(sample_radius.set("Sample radius", 12, 1, 20));
     one_blob_only.set("Only largest blob", true);
 //    color_settings_group.add(one_blob_only.set("Only largest blob", true));
@@ -233,6 +233,8 @@ void ofApp::updateNormalizedObjectLocationInBuffer(ofVec3f v) {
     }
 }
 
+//--------------------------------------------------------------
+
 void ofApp::sendOscMessage() {
     if (buffer.at(buffer_position).x != -1) {
         ofxOscMessage m;
@@ -266,21 +268,28 @@ void ofApp::drawObjectCursor() {
     }
 }
 
-void ofApp::drawStatusMessage(ofVec3f v) {
+void ofApp::drawObjectCursorAtPosition(ofVec3f v) {
+    ofVec3f vs = normToWindow(v);
     ofPushStyle();
     ofFill();
-    ofSetColor(255, 255, 255, 200);
-    std::string buf = "Sending message " + string(msg.get()) + " to " + string(server.get()) + " on port " + ofToString(port.get());
-    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 50);
-    buf = "X=" + ofToString(v.x) + ", Y=" + ofToString(v.y) + ", Z=" + ofToString(v.z);
-    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 20);
+    ofSetColor(0, 0, 0);
+    ofDrawCircle(vs.x, vs.y, ofGetWindowWidth() / 100.0f);
+    ofSetColor(255, 255, 255);
+    ofDrawCircle(vs.x, vs.y, ofGetWindowWidth() / 150.0f);
     ofPopStyle();
 }
 
-/**
- * Plots the trail with coordinates from the ring buffer, with ofVec3f objects with range [0, 1]. The ring
- * buffer is read from the position given by buffer_position.
- */
+void ofApp::drawMouseCursor() const {
+    ofPushStyle();
+    ofFill();
+    ofSetColor(255, 255, 255, 64);
+    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), sample_radius);
+    ofNoFill();
+    ofSetColor(255, 255, 255, 255);
+    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), sample_radius);
+    ofPopStyle();
+}
+
 void ofApp::drawTrail() {
 
     int j = 0;
@@ -300,25 +309,14 @@ void ofApp::drawTrail() {
     ofPopStyle();
 }
 
-void ofApp::drawObjectCursorAtPosition(ofVec3f v) {
-    ofVec3f vs = normToWindow(v);
+void ofApp::drawStatusMessage(ofVec3f v) {
     ofPushStyle();
     ofFill();
-    ofSetColor(0, 0, 0);
-    ofDrawCircle(vs.x, vs.y, ofGetWindowWidth()/100.0f);
-    ofSetColor(255, 255, 255);
-    ofDrawCircle(vs.x, vs.y, ofGetWindowWidth()/150.0f);
-    ofPopStyle();
-}
-
-void ofApp::drawMouseCursor() const {
-    ofPushStyle();
-    ofFill();
-    ofSetColor(255, 255, 255, 64);
-    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), sample_radius);
-    ofNoFill();
-    ofSetColor(255, 255, 255, 255);
-    ofDrawCircle(ofGetMouseX(), ofGetMouseY(), sample_radius);
+    ofSetColor(255, 255, 255, 200);
+    std::string buf = "Sending message " + string(msg.get()) + " to " + string(server.get()) + " on port " + ofToString(port.get());
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 50);
+    buf = "X=" + ofToString(v.x) + ", Y=" + ofToString(v.y) + ", Z=" + ofToString(v.z);
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 20);
     ofPopStyle();
 }
 
@@ -387,50 +385,6 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 //--------------------------------------------------------------
 
-ofVec3f ofApp::normToWindow(ofVec3f v) {
-    float x = ofMap(v.x, 0.0f, 1.0f, 0, ofGetWindowWidth());
-    float y = ofMap(v.y, 0.0f, 1.0f, 0, ofGetWindowHeight());
-    float z = ofMap(v.z, 0.0f, 1.0f, 0, ofGetWindowWidth() * ofGetWindowHeight());
-    return ofVec3f(x, y, z);
-}
-
-ofVec3f ofApp::windowToNorm(ofVec3f v) {
-    float x = ofMap(v.x, 0, ofGetWindowWidth(), 0.0f, 1.0f);
-    float y = ofMap(v.y, 0, ofGetWindowHeight(), 0.0f, 1.0f);
-    float z = ofMap(v.z, 0, ofGetWindowWidth() * ofGetWindowHeight(), 0.0f, 1.0f);
-
-    return ofVec3f(x, y, z);
-}
-
-/**
- * Finds closed contours (blobs) and updates moments (mu), mass centers (mc), max_area and argmax_area.
- */
-void ofApp::find_blobs() {
-
-    max_area = 0.0;
-    argmax_area = -1;
-
-    // Compute the moments of the closed contours
-    mu.clear();
-    mu.resize(allContours.size());
-    for (int i = 0; i < allContours.size(); i++) {
-        mu[i] = moments(allContours[i], false);
-
-        // Find the largest blob, mu[i].m00 is the area of the blob
-        max_area = max_area > mu[i].m00 ? max_area : mu[i].m00;
-
-        // Find the index of the largest blob
-        argmax_area = max_area > mu[i].m00 ? argmax_area : i;
-    }
-
-    //  Compute the mass centers
-    mc.clear();
-    mc.resize(allContours.size());
-    for (int i = 0; i < allContours.size(); i++) {
-        mc[i] = cv::Point2f(static_cast<float>(mu[i].m10 / mu[i].m00), static_cast<float>(mu[i].m01 / mu[i].m00));
-    }
-}
-
 void ofApp::calibrate(int x, int y) {
 
     Hmin = 255;
@@ -471,6 +425,52 @@ void ofApp::calibrate(int x, int y) {
     ofLog(OF_LOG_NOTICE, "S = [" + std::to_string(Smin) + ", " + std::to_string(Smax) + "]");
     ofLog(OF_LOG_NOTICE, "V = [" + std::to_string(Vmin) + ", " + std::to_string(Vmax) + "]");
     ofLog(OF_LOG_NOTICE, "r = " + std::to_string(sample_radius.get()));
+}
+
+/**
+ * Finds closed contours (blobs) and updates moments (mu), mass centers (mc), max_area and argmax_area.
+ */
+void ofApp::find_blobs() {
+
+    max_area = 0.0;
+    argmax_area = -1;
+
+    // Compute the moments of the closed contours
+    mu.clear();
+    mu.resize(allContours.size());
+    for (int i = 0; i < allContours.size(); i++) {
+        mu[i] = moments(allContours[i], false);
+
+        // Find the largest blob, mu[i].m00 is the area of the blob
+        max_area = max_area > mu[i].m00 ? max_area : mu[i].m00;
+
+        // Find the index of the largest blob
+        argmax_area = max_area > mu[i].m00 ? argmax_area : i;
+    }
+
+    //  Compute the mass centers
+    mc.clear();
+    mc.resize(allContours.size());
+    for (int i = 0; i < allContours.size(); i++) {
+        mc[i] = cv::Point2f(static_cast<float>(mu[i].m10 / mu[i].m00), static_cast<float>(mu[i].m01 / mu[i].m00));
+    }
+}
+
+//--------------------------------------------------------------
+
+ofVec3f ofApp::normToWindow(ofVec3f v) {
+    float x = ofMap(v.x, 0.0f, 1.0f, 0, ofGetWindowWidth());
+    float y = ofMap(v.y, 0.0f, 1.0f, 0, ofGetWindowHeight());
+    float z = ofMap(v.z, 0.0f, 1.0f, 0, ofGetWindowWidth() * ofGetWindowHeight());
+    return ofVec3f(x, y, z);
+}
+
+ofVec3f ofApp::windowToNorm(ofVec3f v) {
+    float x = ofMap(v.x, 0, ofGetWindowWidth(), 0.0f, 1.0f);
+    float y = ofMap(v.y, 0, ofGetWindowHeight(), 0.0f, 1.0f);
+    float z = ofMap(v.z, 0, ofGetWindowWidth() * ofGetWindowHeight(), 0.0f, 1.0f);
+
+    return ofVec3f(x, y, z);
 }
 
 int ofApp::modn(int a, int b) {
