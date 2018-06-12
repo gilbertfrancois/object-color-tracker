@@ -172,11 +172,11 @@ void ofApp::updateFilterMasks() {
     rgbm = ofxCv::toCv(videoGrabber);
 
     // Mirror camera image
-    flip(rgbm, rgb, 1);
-    cvtColor(rgb, hsb, cv::COLOR_RGB2HSV_FULL);
+    cv::flip(rgbm, rgb, 1);
+    cv::cvtColor(rgb, hsb, cv::COLOR_RGB2HSV_FULL);
 
     // Add a bit of blur to eliminate camera noise.
-    blur(hsb, hsb, cv::Size(10, 10));
+    cv::blur(hsb, hsb, cv::Size(10, 10));
 
     // Split the hsv image per channel into grayscale images
     cv::Mat tmp[3];
@@ -188,19 +188,19 @@ void ofApp::updateFilterMasks() {
     // Get the latest tolerance values set by the user
     updateHSVRange();
 
-    inRange(h, Hmin_tol, Hmax_tol, maskH);
-    inRange(s, Smin_tol, Smax_tol, maskS);
-    inRange(b, Vmin_tol, Vmax_tol, maskV);
+    cv::inRange(h, Hmin_tol, Hmax_tol, maskH);
+    cv::inRange(s, Smin_tol, Smax_tol, maskS);
+    cv::inRange(b, Vmin_tol, Vmax_tol, maskV);
 
     // Add all 3 masks with binary AND operation
     ftr = maskH & maskS & maskV;
 
     // Fill holes
     cv::Mat st_elem = getStructuringElement(cv::MORPH_ELLIPSE, cv::Size(5, 5));
-    erode(ftr, ftr, st_elem);
-    dilate(ftr, ftr, st_elem);
-    dilate(ftr, ftr, st_elem);
-    erode(ftr, ftr, st_elem);
+    cv::erode(ftr, ftr, st_elem);
+    cv::dilate(ftr, ftr, st_elem);
+    cv::dilate(ftr, ftr, st_elem);
+    cv::erode(ftr, ftr, st_elem);
 }
 
 void ofApp::updateHSVRange() {
