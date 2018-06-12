@@ -180,7 +180,7 @@ void ofApp::updateFilterMasks() {
 
     // Split the hsv image per channel into grayscale images
     cv::Mat tmp[3];
-    split(hsb, tmp);
+    cv::split(hsb, tmp);
     h = tmp[0];
     s = tmp[1];
     b = tmp[2];
