@@ -167,7 +167,10 @@ void ofApp::updateObjectLocation() {
         updateNormalizedObjectLocationInBuffer(windowToNorm(ofVec3f(mc[argmax_area].x, mc[argmax_area].y, max_area)));
 
     } else {
-        buffer.at(buffer_position) = ofVec3f(-1, -1, -1);
+        pos = ofVec3f(-1, -1, -1);
+        vel = ofVec3f(0.0f);
+        acc = ofVec3f(0.0f);
+        buffer.at(buffer_position) = pos;
     }
 }
 
@@ -219,32 +222,52 @@ void ofApp::updateHSVRange() {
 
 void ofApp::updateNormalizedObjectLocationInBuffer(ofVec3f v) {
 
-    if (lpf.get()) {
-        int im1 = modn(buffer_position - 1, buffer_size);
-        int im2 = modn(buffer_position - 2, buffer_size);
-        ofVec3f vm1 = buffer.at(im1);
-        ofVec3f vm2 = buffer.at(im2);
-        if (vm1.x == -1) {
-            vm1 = v;
-        }
-        if (vm2.x == -1) {
-            vm2 = vm1;
-        }
-        buffer.at(buffer_position) = (3 * v + 2 * vm1 + vm2) / 6.0f;
-    } else {
-        buffer.at(buffer_position) = v;
+    int im1 = modn(buffer_position - 1, buffer_size);
+    int im2 = modn(buffer_position - 2, buffer_size);
+    ofVec3f vm1 = buffer.at(im1);
+    ofVec3f vm2 = buffer.at(im2);
+    if (vm1.x == -1) {
+        vm1 = v;
     }
+    if (vm2.x == -1) {
+        vm2 = vm1;
+    }
+    if (lpf.get()) {
+        v = (3 * v + 2 * vm1 + vm2) / 6.0f;
+
+    }
+    buffer.at(buffer_position) = v;
+
+    // Set the time delta relative to 30fps instead of actual time delta to prevent underflow of v and a.
+    float dt = (float) ofGetFrameRate() / 30.0f;
+    pos = v;
+    vel = (v - vm1) / dt;
+    // compute acceleration at t-1, because we do not have a value at t+1 yet.
+    acc = (vm2 - 2*vm1 + v) / (dt*dt);
 }
 
 //--------------------------------------------------------------
 
 void ofApp::sendOscMessage() {
-    if (buffer.at(buffer_position).x != -1) {
+    if (pos.x != -1) {
         ofxOscMessage m;
         m.setAddress(string(msg.get()));
-        m.addFloatArg(buffer.at(buffer_position).x);
-        m.addFloatArg(buffer.at(buffer_position).y);
-        m.addFloatArg(buffer.at(buffer_position).z);
+
+        // position
+        m.addFloatArg(pos.x);
+        m.addFloatArg(pos.y);
+        m.addFloatArg(pos.z);
+
+        // velocity
+        m.addFloatArg(vel.x);
+        m.addFloatArg(vel.y);
+        m.addFloatArg(vel.z);
+
+        // accelleration
+        m.addFloatArg(acc.x);
+        m.addFloatArg(acc.y);
+        m.addFloatArg(acc.z);
+
         sender.sendMessage(m, false);
         oscMessageSent = true;
     } else {
@@ -316,10 +339,19 @@ void ofApp::drawStatusMessage(ofVec3f v) {
     ofPushStyle();
     ofFill();
     ofSetColor(255, 255, 255, 200);
-    std::string buf = "Sending message " + string(msg.get()) + " to " + string(server.get()) + " on port " + ofToString(port.get());
-    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 50);
-    buf = "X=" + ofToString(v.x) + ", Y=" + ofToString(v.y) + ", Z=" + ofToString(v.z);
-    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 20);
+    std::string buf =
+            "Sending message " + string(msg.get()) +
+            " to " + string(server.get()) +
+            " on port " + ofToString(port.get()) + " with 9 inputs.";
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 55);
+    buf = " x = " + ofToString(pos.x, 5, 8, ' ') + ",  y = " + ofToString(pos.y, 5, 8, ' ') + ",  z = " + ofToString(pos.z, 5, 8, ' ');
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 40);
+    buf = "vx = " + ofToString(vel.x, 5, 8, ' ') + ", vy = " + ofToString(vel.y, 5, 8, ' ') + ", vz = " + ofToString(vel.z, 5, 8, ' ');
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 25);
+    buf = "ax = " + ofToString(acc.x, 5, 8, ' ') + ", ay = " + ofToString(acc.y, 5, 8, ' ') + ", az = " + ofToString(acc.z, 5, 8, ' ');
+    ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 10);
+
+
     ofPopStyle();
 }
 

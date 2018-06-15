@@ -73,12 +73,24 @@ private:
     std::vector<std::vector<cv::Point>> allContours;
     std::vector<cv::Moments> mu;
     std::vector<cv::Point2f> mc;
-    double max_area = 0.0;
+    float max_area = 0.0f;
     int argmax_area = -1;
 
     std::vector<ofVec3f> buffer;
     int buffer_size = 50;
     int buffer_position = 0;
+
+    ofVec3f pos;
+    ofVec3f vel;
+    ofVec3f acc;
+
+
+
+
+
+
+
+
 
 
 public:
@@ -150,6 +162,8 @@ public:
     void gotMessage(ofMessage msg);
 
     void dragEvent(ofDragInfo dragInfo);
+
+    void portChanged(std::string &v);
 
     //--------------------------------------------------------------
 
