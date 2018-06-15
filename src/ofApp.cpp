@@ -21,6 +21,7 @@ void ofApp::setup() {
     sender.setup(server.get(), std::stoi(port.get()));
 
     ofSetFrameRate((int) fps.get());
+    ofSetVerticalSync(true);
 }
 
 void ofApp::update() {
@@ -382,6 +383,12 @@ void ofApp::gotMessage(ofMessage msg) {
 void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }
+
+void ofApp::portChanged(std::string &v) {
+    sender.clear();
+    sender.setup(server.get(), std::stoi(port.get()));
+    ofLog(OF_LOG_NOTICE, "Port changed to " + port.get());
+};
 
 //--------------------------------------------------------------
 
