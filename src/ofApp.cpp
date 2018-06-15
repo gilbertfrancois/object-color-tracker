@@ -118,6 +118,8 @@ void ofApp::setupImageBuffers() {
 
 void ofApp::setupGui() {
 
+    port.addListener(this, &ofApp::portChanged);
+
     color_settings_group.setName("Calibration");
     color_settings_group.add(tol_h.set("Tolerance Hue", 2, 0, 20));
     color_settings_group.add(tol_s.set("Tolerance Saturation", 15, 0, 100));
