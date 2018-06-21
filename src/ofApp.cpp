@@ -383,7 +383,7 @@ void ofApp::drawHelpPanel() {
     ofDrawBitmapString("------------------", ofVec2f(offset2, offset_y + 1 * line_height));
     ofDrawBitmapString("", ofVec2f(offset2, offset_y + 2 * line_height));
     ofDrawBitmapString("[ 1 ] Webcam view", ofVec2f(offset2, offset_y + 3 * line_height));
-    ofDrawBitmapString("[ 2 ] Countours", ofVec2f(offset2, offset_y + 4 * line_height));
+    ofDrawBitmapString("[ 2 ] Contours", ofVec2f(offset2, offset_y + 4 * line_height));
     ofDrawBitmapString("[ 3 ] Object trail", ofVec2f(offset2, offset_y + 5 * line_height));
     ofDrawBitmapString("[ s ] Setup panel", ofVec2f(offset2, offset_y + 6 * line_height));
     ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 7 * line_height));
