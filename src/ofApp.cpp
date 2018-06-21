@@ -63,7 +63,9 @@ void ofApp::draw() {
     }
 
     // Draw Settings Panel
-    gui.draw();
+    if (showGui) {
+        gui.draw();
+    }
 
     // Show only the largest blob or all blobs within range of area from settings.
     drawObjectCursor();
@@ -78,6 +80,10 @@ void ofApp::draw() {
 
     if (oscMessageSent) {
         drawStatusMessage(buffer.at(buffer_position));
+    }
+
+    if (show_help.get()) {
+        drawHelpPanel();
     }
 }
 
@@ -118,7 +124,13 @@ void ofApp::setupImageBuffers() {
 
 void ofApp::setupGui() {
 
+    port.set("Port", "6448");
+    fps.set("FPS", 30, 0, 60);
+
+    server.addListener(this, &ofApp::serverChanged);
     port.addListener(this, &ofApp::portChanged);
+    msg.addListener(this, &ofApp::msgChanged);
+    fps.addListener(this, &ofApp::fpsChanged);
 
     color_settings_group.setName("Calibration");
     color_settings_group.add(tol_h.set("Tolerance Hue", 2, 0, 20));
@@ -130,7 +142,6 @@ void ofApp::setupGui() {
             1000, static_cast<unsigned long>(0.5 * ofGetWindowWidth() * ofGetWindowHeight())));
     color_settings_group.add(sample_radius.set("Sample radius", 12, 1, 20));
     one_blob_only.set("Only largest blob", true);
-//    color_settings_group.add(one_blob_only.set("Only largest blob", true));
     color_settings_group.add(lpf.set("Low pass filter", true));
 
     comm_settings_group.setName("Commumication");
@@ -143,6 +154,7 @@ void ofApp::setupGui() {
     display_settings_group.add(show_webcam_view.set("Show camera preview", true));
     display_settings_group.add(show_contours.set("Show contours", true));
     display_settings_group.add(show_trail.set("Show trail", true));
+    display_settings_group.add(show_help.set("Show help", false));
 
     gui.setup("Control Center");
     gui.setDefaultBackgroundColor(ofColor(0, 0, 0, 16));
@@ -243,7 +255,7 @@ void ofApp::updateNormalizedObjectLocationInBuffer(ofVec3f v) {
     pos = v;
     vel = (v - vm1) / dt;
     // compute acceleration at t-1, because we do not have a value at t+1 yet.
-    acc = (vm2 - 2*vm1 + v) / (dt*dt);
+    acc = (vm2 - 2 * vm1 + v) / (dt * dt);
 }
 
 //--------------------------------------------------------------
@@ -341,8 +353,8 @@ void ofApp::drawStatusMessage(ofVec3f v) {
     ofSetColor(255, 255, 255, 200);
     std::string buf =
             "Sending message " + string(msg.get()) +
-            " to " + string(server.get()) +
-            " on port " + ofToString(port.get()) + " with 9 inputs.";
+                    " to " + string(server.get()) +
+                    " on port " + ofToString(port.get()) + " with 9 inputs.";
     ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 55);
     buf = " x = " + ofToString(pos.x, 5, 8, ' ') + ",  y = " + ofToString(pos.y, 5, 8, ' ') + ",  z = " + ofToString(pos.z, 5, 8, ' ');
     ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 40);
@@ -352,6 +364,29 @@ void ofApp::drawStatusMessage(ofVec3f v) {
     ofDrawBitmapString(buf, 10, ofGetWindowHeight() - 10);
 
 
+    ofPopStyle();
+}
+
+void ofApp::drawHelpPanel() {
+
+    int offset = ofGetWindowWidth() / 6;
+    int offset2 = offset * 2;
+    int line_height = 15;
+    int offset_y = (ofGetWindowHeight() - 8 * line_height) / 2;
+
+    ofPushStyle();
+    ofSetColor(0, 0, 0, 128);
+    ofDrawRectangle(offset, offset, ofGetWindowWidth() - 2 * offset, ofGetWindowHeight() - 2 * offset);
+
+    ofSetColor(255);
+    ofDrawBitmapString("Keyboard shortcuts", ofVec2f(offset2, offset_y));
+    ofDrawBitmapString("------------------", ofVec2f(offset2, offset_y + 1 * line_height));
+    ofDrawBitmapString("", ofVec2f(offset2, offset_y + 2 * line_height));
+    ofDrawBitmapString("[ 1 ] Webcam view", ofVec2f(offset2, offset_y + 3 * line_height));
+    ofDrawBitmapString("[ 2 ] Countours", ofVec2f(offset2, offset_y + 4 * line_height));
+    ofDrawBitmapString("[ 3 ] Object trail", ofVec2f(offset2, offset_y + 5 * line_height));
+    ofDrawBitmapString("[ s ] Setup panel", ofVec2f(offset2, offset_y + 6 * line_height));
+    ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 7 * line_height));
     ofPopStyle();
 }
 
@@ -372,6 +407,9 @@ void ofApp::keyPressed(int key) {
         case 's':
             showGui = !showGui;
             break;
+        case 'h':
+            show_help.set(!show_help.get());
+            showGui = !show_help.get();
         default:
             break;
     }
@@ -418,11 +456,30 @@ void ofApp::dragEvent(ofDragInfo dragInfo) {
 
 }
 
-void ofApp::portChanged(std::string &v) {
+void ofApp::restartOscSender() {
     sender.clear();
     sender.setup(server.get(), std::stoi(port.get()));
+};
+
+void ofApp::serverChanged(std::string &v) {
+    restartOscSender();
+    ofLog(OF_LOG_NOTICE, "Server changed to " + server.get());
+}
+
+void ofApp::portChanged(std::string &v) {
+    restartOscSender();
     ofLog(OF_LOG_NOTICE, "Port changed to " + port.get());
 };
+
+void ofApp::msgChanged(std::string &v) {
+    restartOscSender();
+    ofLog(OF_LOG_NOTICE, "Message changed to " + msg.get());
+};
+
+void ofApp::fpsChanged(int &v) {
+    ofLog(OF_LOG_NOTICE, "FPS value set to " + std::to_string(v) + ".");
+    ofSetFrameRate(v);
+}
 
 //--------------------------------------------------------------
 
@@ -483,7 +540,7 @@ void ofApp::find_blobs() {
         mu[i] = moments(allContours[i], false);
 
         // Find the largest blob, mu[i].m00 is the area of the blob
-        max_area = max_area > mu[i].m00 ? max_area : mu[i].m00;
+        max_area = max_area > mu[i].m00 ? max_area : static_cast<float>(mu[i].m00);
 
         // Find the index of the largest blob
         argmax_area = max_area > mu[i].m00 ? argmax_area : i;

@@ -28,8 +28,8 @@ private:
     ofParameter<int> tol_s;
     ofParameter<int> tol_v;
     ofParameter<int> sample_radius;
-    ofParameter<int> min_area_size;
-    ofParameter<int> max_area_size;
+    ofParameter<size_t> min_area_size;
+    ofParameter<size_t> max_area_size;
     ofParameter<bool> one_blob_only;
     ofParameter<bool> lpf;
 
@@ -38,6 +38,7 @@ private:
     ofParameter<bool> show_trail;
     ofParameter<bool> show_webcam_view;
     ofParameter<bool> show_contours;
+    ofParameter<bool> show_help;
 
     ofParameterGroup comm_settings_group;
     ofParameter<std::string> msg;
@@ -83,14 +84,6 @@ private:
     ofVec3f pos;
     ofVec3f vel;
     ofVec3f acc;
-
-
-
-
-
-
-
-
 
 
 public:
@@ -139,6 +132,8 @@ public:
 
     void drawStatusMessage(ofVec3f v);
 
+    void drawHelpPanel();
+
     //--------------------------------------------------------------
 
     void keyPressed(int key);
@@ -163,7 +158,13 @@ public:
 
     void dragEvent(ofDragInfo dragInfo);
 
+    void serverChanged(std::string &v);
+
     void portChanged(std::string &v);
+
+    void msgChanged(std::string &v);
+
+    void fpsChanged(int &v);
 
     //--------------------------------------------------------------
 
@@ -179,4 +180,5 @@ public:
 
     int modn(int a, int b);
 
+    void restartOscSender();
 };
