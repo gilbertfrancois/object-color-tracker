@@ -15,6 +15,7 @@ When choosing an object (or clothes) with distinct colour (e.g. bright green), y
 [![Demo video](https://img.youtube.com/vi/rXNgobgluP0/0.jpg)](http://www.youtube.com/watch?v=rXNgobgluP0)
 
 
+
 ## Calibration Settings
 
 - Tolerance hue / saturation / value: Allowed range outside calibration patch. Fiddle with these values until you have isolated the object from the rest of the camera feed. 
@@ -23,9 +24,13 @@ When choosing an object (or clothes) with distinct colour (e.g. bright green), y
 - Sample radius: The patch size for measuring the colour range.
 - Low pass filter: Weak filter that adds a little bit of smoothing. Disable this feature if you think there is too much lag.
 
+
+
 ## Prebuild Binary
 
 A ready-to-run binary is available for macOS and can be downloaded from the [releases](https://github.com/gilbertfrancois/object-color-tracker/releases) page.
+
+
 
 ## Compile
 
@@ -37,6 +42,8 @@ The app is build in C++ using [openFrameworks 0.10.0](http://www.openframeworks.
 - ofxCv
 
 Note that ofxCv is not standard packed in openFrameworks and needs to be downloaded separately from https://github.com/kylemcdonald/ofxCv. Choose the *master* branch for oF 0.10.0 and _stable_ branch if you're using oF 0.9.8. On macOS, use the ProjectGenerator to set the paths correctly and open the project with XCode. 
+
+
 
 ## Known Issues
 
@@ -73,7 +80,11 @@ Note that ofxCv is not standard packed in openFrameworks and needs to be downloa
 
 ## Upgrading OpenCV (optional)
 
-At the time of writing, the ofxOpenCv add-on is shipped with OpenCV version 3.1.0. If you want to run with the latest version of OpenCv you can upgrade the static library and header files in ofxOpenCv. E.g. for macOS, install the latest version of OpenCV with `brew install opencv`. Then run the following shell commands:
+At the time of writing, the ofxOpenCv add-on is shipped with OpenCV version 3.1.0. If you want to run with the latest version of OpenCv you can upgrade the static library and header files in ofxOpenCv by doing these 3 steps (macOS):
+
+1. Install the latest version of OpenCV with `brew install opencv`. 
+
+2. Run the following shell commands:
 
 ```bash
 $ cp -R $OPENCV_DIR/include/*  $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/include/
@@ -83,6 +94,10 @@ $ libtool -static $OPENCV_DIR"/lib/lib*.a" -o $OPENFRAMEWORKS_DIR/addons/ofxOpen
 ```
 
 where `$OPENCV_DIR` points to the installation directory of OpenCV.
+
+3. Add `OpenCL.framework` to the section `Linked Frameworks and Libraries`. 
+
+Sorry, I don't know how to do it on Linux or Windows.
 
 
 
