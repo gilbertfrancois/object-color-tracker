@@ -16,7 +16,8 @@ private:
     const int camHeight = 480;
     const int A = camWidth * camHeight;
 
-    ofVideoGrabber videoGrabber;
+    ofVideoGrabber *videoGrabber;
+    vector<ofVideoDevice> video_device_list;
     ofTrueTypeFont font;
     ofxOscSender sender;
     ofxPanel gui;
@@ -39,6 +40,11 @@ private:
     ofParameter<bool> show_webcam_view;
     ofParameter<bool> show_contours;
     ofParameter<bool> show_help;
+
+    ofParameterGroup camera_group;
+    ofxButton cycle_cameras_button;
+    ofParameter<int> current_camera_device_id;
+    ofParameter<std::string> current_camera_device_name;
 
     ofParameterGroup comm_settings_group;
     ofParameter<std::string> msg;
@@ -166,6 +172,8 @@ public:
 
     void fpsChanged(int &v);
 
+    void cameraDeviceIdChanged(int &v);
+
     //--------------------------------------------------------------
 
     void calibrate(int x, int y);
@@ -181,4 +189,5 @@ public:
     int modn(int a, int b);
 
     void restartOscSender();
+
 };

@@ -26,10 +26,14 @@ void ofApp::setup() {
 
 void ofApp::update() {
 
-    // read next frame from camera
-    videoGrabber.update();
+    if (videoGrabber == nullptr) {
+        return;
+    }
 
-    if (videoGrabber.isFrameNew()) {
+    // read next frame from camera
+    videoGrabber->update();
+
+    if (videoGrabber->isFrameNew()) {
 
         updateFilterMasks();
 
@@ -90,17 +94,18 @@ void ofApp::draw() {
 //--------------------------------------------------------------
 
 void ofApp::setupCamera() {
-    videoGrabber.setVerbose(true);
-    vector<ofVideoDevice> devices = videoGrabber.listDevices();
-    for (int i = 0; i < devices.size(); i++) {
-        if (devices[i].bAvailable) {
-            ofLogNotice() << "Device: " << devices[i].id << ": " << devices[i].deviceName;
+    videoGrabber = new ofVideoGrabber;
+    video_device_list = videoGrabber->listDevices();
+    for (int i = 0; i < video_device_list.size(); i++) {
+        if (video_device_list[i].bAvailable) {
+            ofLogNotice() << "Device: " << video_device_list[i].id << ": " << video_device_list[i].deviceName;
         } else {
-            ofLogNotice() << "Device: " << devices[i].id << ": " << devices[i].deviceName << " - unavailable ";
+            ofLogNotice() << "Device: " << video_device_list[i].id << ": " << video_device_list[i].deviceName
+                          << " - unavailable ";
         }
     }
-    videoGrabber.setDeviceID(0);
-    videoGrabber.setup(camWidth, camHeight);
+    videoGrabber->setDeviceID(0);
+    videoGrabber->setup(camWidth, camHeight);
 }
 
 void ofApp::setupRingBuffer() {
@@ -126,11 +131,13 @@ void ofApp::setupGui() {
 
     port.set("Port", "6448");
     fps.set("FPS", 30, 0, 60);
+    current_camera_device_id.set("Camera ID", 0, 0, (int) video_device_list.size());
 
     server.addListener(this, &ofApp::serverChanged);
     port.addListener(this, &ofApp::portChanged);
     msg.addListener(this, &ofApp::msgChanged);
     fps.addListener(this, &ofApp::fpsChanged);
+    current_camera_device_id.addListener(this, &ofApp::cameraDeviceIdChanged);
 
     color_settings_group.setName("Calibration");
     color_settings_group.add(tol_h.set("Tolerance Hue", 2, 0, 20));
@@ -150,11 +157,15 @@ void ofApp::setupGui() {
     comm_settings_group.add(msg.set("Message", "/wek/inputs"));
 
     display_settings_group.setName("Display");
-    display_settings_group.add(fps.set("FPS", 30, 0, 60));
     display_settings_group.add(show_webcam_view.set("Show camera preview", true));
+    display_settings_group.add(fps.set("FPS", 30, 0, 60));
     display_settings_group.add(show_contours.set("Show contours", true));
     display_settings_group.add(show_trail.set("Show trail", true));
     display_settings_group.add(show_help.set("Show help", false));
+
+    camera_group.setName("Camera");
+//    camera_group.add(current_camera_device_id.set("ID", 0, 0, (int) video_device_list.size()));
+    camera_group.add(current_camera_device_name.set("", video_device_list[current_camera_device_id.get()].deviceName));
 
     gui.setup("Control Center");
     gui.setDefaultBackgroundColor(ofColor(0, 0, 0, 16));
@@ -162,6 +173,7 @@ void ofApp::setupGui() {
     gui.setDefaultTextColor(ofColor(255, 255, 255, 255));
     gui.add(color_settings_group);
     gui.add(display_settings_group);
+    gui.add(camera_group);
     gui.add(comm_settings_group);
     gui.minimizeAll();
 }
@@ -187,7 +199,7 @@ void ofApp::updateObjectLocation() {
 }
 
 void ofApp::updateFilterMasks() {
-    rgbm = ofxCv::toCv(videoGrabber);
+    rgbm = ofxCv::toCv(*videoGrabber);
 
     // Mirror camera image
     cv::flip(rgbm, rgb, 1);
@@ -369,7 +381,7 @@ void ofApp::drawStatusMessage(ofVec3f v) {
 
 void ofApp::drawHelpPanel() {
 
-    int offset = ofGetWindowWidth() / 6;
+    int offset = ofGetWindowWidth() / 7;
     int offset2 = offset * 2;
     int line_height = 15;
     int offset_y = (ofGetWindowHeight() - 8 * line_height) / 2;
@@ -386,7 +398,8 @@ void ofApp::drawHelpPanel() {
     ofDrawBitmapString("[ 2 ] Contours", ofVec2f(offset2, offset_y + 4 * line_height));
     ofDrawBitmapString("[ 3 ] Object trail", ofVec2f(offset2, offset_y + 5 * line_height));
     ofDrawBitmapString("[ s ] Setup panel", ofVec2f(offset2, offset_y + 6 * line_height));
-    ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 7 * line_height));
+    ofDrawBitmapString("[ c ] Cycle though available cameras", ofVec2f(offset2, offset_y + 7 * line_height));
+    ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 8 * line_height));
     ofPopStyle();
 }
 
@@ -394,6 +407,8 @@ void ofApp::drawHelpPanel() {
 //--------------------------------------------------------------
 
 void ofApp::keyPressed(int key) {
+    int new_id = 0;
+    const int device_list_size = (int) video_device_list.size();
     switch (key) {
         case '1':
             show_webcam_view.set(!show_webcam_view.get());
@@ -407,9 +422,14 @@ void ofApp::keyPressed(int key) {
         case 's':
             showGui = !showGui;
             break;
+        case 'c':
+            new_id = current_camera_device_id.get() + 1 >= device_list_size ? 0 : current_camera_device_id.get() + 1;
+            current_camera_device_id.set(new_id);
+            break;
         case 'h':
             show_help.set(!show_help.get());
             showGui = !show_help.get();
+            break;
         default:
             break;
     }
@@ -479,6 +499,21 @@ void ofApp::msgChanged(std::string &v) {
 void ofApp::fpsChanged(int &v) {
     ofLog(OF_LOG_NOTICE, "FPS value set to " + std::to_string(v) + ".");
     ofSetFrameRate(v);
+}
+
+void ofApp::cameraDeviceIdChanged(int &v) {
+    if (videoGrabber != nullptr) {
+        videoGrabber->close();
+        delete videoGrabber;
+    }
+    videoGrabber = new ofVideoGrabber;
+    if (current_camera_device_id.get() >= video_device_list.size()) {
+        current_camera_device_id.set((int) video_device_list.size() - 1);
+    }
+    ofLog(OF_LOG_NOTICE, "Camera ID value set to " + std::to_string(v) + ".");
+    videoGrabber->setDeviceID(current_camera_device_id.get());
+    videoGrabber->setup(camWidth, camHeight);
+    current_camera_device_name.set("", video_device_list[current_camera_device_id.get()].deviceName);
 }
 
 //--------------------------------------------------------------
