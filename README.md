@@ -79,7 +79,7 @@ At the time of writing, the ofxOpenCv add-on is shipped with OpenCV version 3.1.
 $ cp -R $OPENCV_DIR/include/*  $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/include/
 ```
 ```bash
-$ libtool -static $OPENCV_DIR"/lib/lib*.a" -o \ $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a
+$ libtool -static $OPENCV_DIR"/lib/lib*.a" -o $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a
 ```
 
 where `$OPENCV_DIR` points to the installation directory of OpenCV.
