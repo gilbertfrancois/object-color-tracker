@@ -69,6 +69,23 @@ Note that ofxCv is not standard packed in openFrameworks and needs to be downloa
 
 ```
 
+
+
+## Upgrading OpenCV (optional)
+
+At the time of writing, the ofxOpenCv add-on is shipped with OpenCV version 3.1.0. If you want to run with the latest version of OpenCv you can upgrade the static library and header files in ofxOpenCv. E.g. for macOS, install the latest version of OpenCV with `brew install opencv`. Then run the following shell commands:
+
+```bash
+$ cp -R $OPENCV_DIR/include/*  $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/include/
+```
+```bash
+$ libtool -static $OPENCV_DIR"/lib/lib*.a" -o \ $OPENFRAMEWORKS_DIR/addons/ofxOpenCv/libs/opencv/lib/osx/opencv.a
+```
+
+where `$OPENCV_DIR` points to the installation directory of OpenCV.
+
+
+
 ## License
 
 The object color tracker is created by Gilbert François Duivesteijn and distributed under GPL v2 license. The library openFrameworks is distributed under the MIT License.
