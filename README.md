@@ -16,6 +16,10 @@ When choosing an object (or clothes) with distinct colour (e.g. bright green), y
 
 
 
+## Multiple camera support
+
+Since version 1.1.0, you can cycle through available cameras by pressing the button `c`. In the Control Center panel is an info field that indicates the current active camera.
+
 ## Calibration Settings
 
 - Tolerance hue / saturation / value: Allowed range outside calibration patch. Fiddle with these values until you have isolated the object from the rest of the camera feed. 
