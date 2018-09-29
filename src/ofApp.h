@@ -12,6 +12,8 @@
 class ofApp : public ofBaseApp {
 
 private:
+    const std::string VERSION = "1.1.1";
+    
     const int camWidth = 640;
     const int camHeight = 480;
     const int A = camWidth * camHeight;
