@@ -20,7 +20,7 @@ void ofApp::setup() {
 
     sender.setup(server.get(), std::stoi(port.get()));
 
-    ofSetFrameRate((int) fps.get());
+    ofSetFrameRate(static_cast<int>(fps.get()));
     ofSetVerticalSync(true);
 }
 
@@ -83,7 +83,7 @@ void ofApp::draw() {
     drawMouseCursor();
 
     if (oscMessageSent) {
-        drawStatusMessage(buffer.at(buffer_position));
+        drawStatusMessage(buffer.at(static_cast<unsigned long>(buffer_position)));
     }
 
     if (show_help.get()) {
@@ -131,7 +131,7 @@ void ofApp::setupGui() {
 
     port.set("Port", "6448");
     fps.set("FPS", 30, 0, 60);
-    current_camera_device_id.set("Camera ID", 0, 0, (int) video_device_list.size());
+    current_camera_device_id.set("Camera ID", 0, 0, static_cast<int>(video_device_list.size()));
 
     server.addListener(this, &ofApp::serverChanged);
     port.addListener(this, &ofApp::portChanged);
@@ -193,7 +193,7 @@ void ofApp::updateObjectLocation() {
         pos = ofVec3f(-1, -1, -1);
         vel = ofVec3f(0.0f);
         acc = ofVec3f(0.0f);
-        buffer.at(buffer_position) = pos;
+        buffer.at(static_cast<unsigned long>(buffer_position)) = pos;
     }
 }
 
@@ -247,8 +247,8 @@ void ofApp::updateNormalizedObjectLocationInBuffer(ofVec3f v) {
 
     int im1 = modn(buffer_position - 1, buffer_size);
     int im2 = modn(buffer_position - 2, buffer_size);
-    ofVec3f vm1 = buffer.at(im1);
-    ofVec3f vm2 = buffer.at(im2);
+    ofVec3f vm1 = buffer.at(static_cast<unsigned long>(im1));
+    ofVec3f vm2 = buffer.at(static_cast<unsigned long>(im2));
     if (vm1.x == -1) {
         vm1 = v;
     }
@@ -259,10 +259,10 @@ void ofApp::updateNormalizedObjectLocationInBuffer(ofVec3f v) {
         v = (3 * v + 2 * vm1 + vm2) / 6.0f;
 
     }
-    buffer.at(buffer_position) = v;
+    buffer.at(static_cast<unsigned long>(buffer_position)) = v;
 
     // Set the time delta relative to 30fps instead of actual time delta to prevent underflow of v and a.
-    float dt = (float) ofGetFrameRate() / 30.0f;
+    float dt = ofGetFrameRate() / 30.0f;
     pos = v;
     vel = (v - vm1) / dt;
     // compute acceleration at t-1, because we do not have a value at t+1 yet.
@@ -304,10 +304,10 @@ void ofApp::drawObjectCursor() {
     if (allContours.size() > 0) {
         if (one_blob_only.get() && argmax_area != -1) {
             if (max_area > min_area_size.get() && max_area < max_area_size.get()) {
-                drawObjectCursorAtPosition(buffer.at(buffer_position));
+                drawObjectCursorAtPosition(buffer.at(static_cast<unsigned long>(buffer_position)));
             }
         } else {
-            buffer.at(buffer_position) = ofVec3f(-1, -1);
+            buffer.at(static_cast<unsigned long>(buffer_position)) = ofVec3f(-1, -1);
             for (int i = 0; i < allContours.size(); i++) {
                 if (mu[i].m00 > min_area_size.get() && mu[i].m00 < max_area_size.get()) {
                     drawObjectCursorAtPosition(ofVec3f(mc[i].x, mc[i].y));
@@ -411,7 +411,7 @@ void ofApp::drawHelpPanel() {
 
 void ofApp::keyPressed(int key) {
     int new_id = 0;
-    const int device_list_size = (int) video_device_list.size();
+    const int device_list_size = static_cast<int>(video_device_list.size());
     switch (key) {
         case '1':
             show_webcam_view.set(!show_webcam_view.get());
@@ -511,7 +511,7 @@ void ofApp::cameraDeviceIdChanged(int &v) {
     }
     videoGrabber = new ofVideoGrabber;
     if (current_camera_device_id.get() >= video_device_list.size()) {
-        current_camera_device_id.set((int) video_device_list.size() - 1);
+        current_camera_device_id.set(static_cast<int>(video_device_list.size() - 1));
     }
     ofLog(OF_LOG_NOTICE, "Camera ID value set to " + std::to_string(v) + ".");
     videoGrabber->setDeviceID(current_camera_device_id.get());
@@ -530,8 +530,8 @@ void ofApp::calibrate(int x, int y) {
     Vmin = 255;
     Vmax = 0;
 
-    int orgX = (int) round(((double) ofGetWindowWidth() / 2.0) - ((double) camWidth / 2.0));
-    int orgY = (int) round(((double) ofGetWindowHeight() / 2.0) - ((double) camHeight / 2.0));
+    int orgX = static_cast<int>(round(((double) ofGetWindowWidth() / 2.0) - ((double) camWidth / 2.0)));
+    int orgY = static_cast<int>(round(((double) ofGetWindowHeight() / 2.0) - ((double) camHeight / 2.0)));
 
     int imin = -sample_radius.get();
     int imax = sample_radius.get();
@@ -541,9 +541,9 @@ void ofApp::calibrate(int x, int y) {
         for (int j = imin; j <= imax; j += 1) {
             int mx = (x + i - orgX) % camWidth;
             int my = (y + j - orgY) % camHeight;
-            int h_i = (int) h.data[my * camWidth + mx];
-            int s_i = (int) s.data[my * camWidth + mx];
-            int v_i = (int) b.data[my * camWidth + mx];
+            int h_i = static_cast<int>(h.data[my * camWidth + mx]);
+            int s_i = static_cast<int>(s.data[my * camWidth + mx]);
+            int v_i = static_cast<int>(b.data[my * camWidth + mx]);
 
             Hmin = Hmin > h_i ? h_i : Hmin;
             Hmax = Hmax < h_i ? h_i : Hmax;
