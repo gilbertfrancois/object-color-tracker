@@ -151,7 +151,7 @@ void ofApp::setupGui() {
     one_blob_only.set("Only largest blob", true);
     color_settings_group.add(lpf.set("Low pass filter", true));
 
-    comm_settings_group.setName("Commumication");
+    comm_settings_group.setName("Communication");
     comm_settings_group.add(server.set("Server", "localhost"));
     comm_settings_group.add(port.set("Port", "6448"));
     comm_settings_group.add(msg.set("Message", "/wek/inputs"));
