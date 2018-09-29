@@ -12,7 +12,7 @@
 class ofApp : public ofBaseApp {
 
 private:
-    const std::string VERSION = "1.1.1";
+    const std::string VERSION = "1.1.2";
     
     const int camWidth = 640;
     const int camHeight = 480;
