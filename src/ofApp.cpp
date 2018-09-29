@@ -384,7 +384,7 @@ void ofApp::drawHelpPanel() {
     int offset = ofGetWindowWidth() / 7;
     int offset2 = offset * 2;
     int line_height = 15;
-    int offset_y = (ofGetWindowHeight() - 8 * line_height) / 2;
+    int offset_y = (ofGetWindowHeight() - 10 * line_height) / 2;
 
     ofPushStyle();
     ofSetColor(0, 0, 0, 128);
@@ -400,6 +400,10 @@ void ofApp::drawHelpPanel() {
     ofDrawBitmapString("[ s ] Setup panel", ofVec2f(offset2, offset_y + 6 * line_height));
     ofDrawBitmapString("[ c ] Cycle though available cameras", ofVec2f(offset2, offset_y + 7 * line_height));
     ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 8 * line_height));
+    ofDrawBitmapString("Author:  Gilbert Francois Duivesteijn", ofVec2f(offset2, ofGetWindowHeight() - offset -3*line_height));
+    ofDrawBitmapString("License: GPLv2", ofVec2f(offset2, ofGetWindowHeight() - offset -2*line_height));
+
+
     ofPopStyle();
 }
 
