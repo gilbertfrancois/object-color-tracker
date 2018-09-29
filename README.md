@@ -32,7 +32,25 @@ Since version 1.1.0, you can cycle through available cameras by pressing the but
 
 ## Prebuild Binary
 
-A ready-to-run binary is available for macOS and can be downloaded from the [releases](https://github.com/gilbertfrancois/object-color-tracker/releases) page.
+A ready-to-run binary is available for macOS and Linux. They can be downloaded from the [releases](https://github.com/gilbertfrancois/object-color-tracker/releases) page. 
+
+### macOS
+
+- Drag the app to the `Applications` folder and double click to start the program
+
+### Linux
+
+- Download and unpack the tar file with 
+
+```bash
+tar zxvf filename.tar.gz
+```
+
+- Open a terminal, go to the `object-color-tracker` folder and start the program with 
+
+```bash
+./bin/object-color-tracker
+```
 
 
 
