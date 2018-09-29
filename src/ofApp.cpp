@@ -25,7 +25,7 @@ void ofApp::setup() {
 }
 
 void ofApp::update() {
-
+    
     if (videoGrabber == nullptr) {
         return;
     }
@@ -56,6 +56,8 @@ void ofApp::update() {
 
 void ofApp::draw() {
 
+    ofBackground(64, 64, 64);
+    
     // Draw contours
     if (show_contours.get()) {
         cv::drawContours(rgb, allContours, -1, cv::Scalar::all(255));
