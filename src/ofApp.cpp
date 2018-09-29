@@ -162,10 +162,10 @@ void ofApp::setupGui() {
     display_settings_group.add(show_contours.set("Show contours", true));
     display_settings_group.add(show_trail.set("Show trail", true));
     display_settings_group.add(show_help.set("Show help", false));
-    
+
     camera_group.setName("Camera info");
     camera_group.add(current_camera_device_name.set("", video_device_list[current_camera_device_id.get()].deviceName));
-    
+
     gui.setup("Control Center");
     gui.setDefaultBackgroundColor(ofColor(0, 0, 0, 16));
     gui.setDefaultFillColor(ofColor(0, 0, 0, 64));
@@ -399,8 +399,8 @@ void ofApp::drawHelpPanel() {
     ofDrawBitmapString("[ s ] Setup panel", ofVec2f(offset2, offset_y + 6 * line_height));
     ofDrawBitmapString("[ c ] Cycle though available cameras", ofVec2f(offset2, offset_y + 7 * line_height));
     ofDrawBitmapString("[ h ] Help", ofVec2f(offset2, offset_y + 8 * line_height));
-    ofDrawBitmapString("Author:  Gilbert Francois Duivesteijn", ofVec2f(offset2, ofGetWindowHeight() - offset -3*line_height));
-    ofDrawBitmapString("License: GPLv2", ofVec2f(offset2, ofGetWindowHeight() - offset -2*line_height));
+    ofDrawBitmapString("Author:  Gilbert Francois Duivesteijn", ofVec2f(offset2, ofGetWindowHeight() - offset - 3 * line_height));
+    ofDrawBitmapString("License: GPLv2", ofVec2f(offset2, ofGetWindowHeight() - offset - 2 * line_height));
 
 
     ofPopStyle();
